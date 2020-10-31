@@ -154,6 +154,24 @@ void abFree(struct abuf *ab) {
 
 /*** input ***/
 
+// function to move the cursor
+void editorMoveCursor(char key) {
+	switch (key) {
+		case 'a':
+			E.cx--;
+			break;
+		case 'd':
+			E.cx++;
+			break;
+		case 'w':
+			E.cy--;
+			break;
+		case 's':
+			E.cy++;
+			break;
+	}
+}
+
 // function to process key presses
 void editorProcessKeyPress() {
 	char c = editorReadKey();
@@ -166,6 +184,12 @@ void editorProcessKeyPress() {
 
 			// exit the program
 			exit(0);
+			break;
+		case 'w':
+		case 's':
+		case 'a':
+		case 'd':
+			editorMoveCursor(c);
 			break;
 	}
 }
