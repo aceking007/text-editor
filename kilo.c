@@ -187,6 +187,8 @@ void editorRefreshScreen() {
 	// initialize append buffer
 	struct abuf ab = ABUF_INIT;
 
+	// hide the cursor
+	abAppend(&ab, "\x1b[?25l", 6);
 	// clears the whole screen
 	abAppend(&ab, "\x1b[2J", 4);
 	// reposition cursor to the start
@@ -195,6 +197,7 @@ void editorRefreshScreen() {
 	// draw tildes and reposition cursor
 	editorDrawRows(&ab);
 	abAppend(&ab, "\x1b[H", 3);
+	abAppend(&ab, "\x1b[?25h", 6);
 
 	// print out the append buffer to screen and free memory
 	write(STDOUT_FILENO, ab.b, ab.len);
