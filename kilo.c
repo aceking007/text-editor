@@ -18,7 +18,13 @@ struct termios orig_termios;
 
 /*** terminal ***/
 
+// function to handle exiting when error occurs
 void die(const char *s) {
+	// clear screen and reposition cursor
+	write(STDOUT_FILENO, "\x1b[2J", 4);
+	write(STDOUT_FILENO, "\x1b[H", 3);
+
+	// display error and exit program
 	perror(s);
 	exit(1);
 }
@@ -86,6 +92,11 @@ void editorProcessKeyPress() {
 
 	switch (c) {
 		case CTRL_KEY('q'):
+			// clear screen and reposition cursor
+			write(STDOUT_FILENO, "\x1b[2J", 4);
+			write(STDOUT_FILENO, "\x1b[H", 3);
+
+			// exit the program
 			exit(0);
 			break;
 	}
