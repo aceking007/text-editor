@@ -13,8 +13,12 @@
 
 /*** data ***/
 
-// struct to store original terminal attributes
-struct termios orig_termios;
+// struct for editor config
+struct editorConfig {
+	struct termios orig_termios;
+};
+
+struct editorConfig E;
 
 /*** terminal ***/
 
@@ -31,7 +35,7 @@ void die(const char *s) {
 
 // function to restore canonical mode after exiting program
 void disableRawMode() {
-	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1) { 
+	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &E.orig_termios) == -1) { 
 		die("tcsetattr");
 	}
 }
@@ -40,11 +44,11 @@ void disableRawMode() {
 // in raw mode, data is read byte-by-byte and other things
 void enableRawMode() {
 	// get the current attributes
-	if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
+	if (tcgetattr(STDIN_FILENO, &E.orig_termios) == -1) die("tcgetattr");
 	atexit(disableRawMode);
 
 	// struct for manipulating terminal attributes
-	struct termios raw = orig_termios;
+	struct termios raw = E.orig_termios;
 	// the following flags turn off the corresponding items:
  
 	// ixon -- ctrl-s and ctrl-q = XOFF and XON
