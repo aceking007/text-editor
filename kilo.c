@@ -18,6 +18,7 @@
 
 // struct for editor config
 struct editorConfig {
+	int cx, cy;
 	int screenrows;
 	int screencols;
 	struct termios orig_termios;
@@ -211,9 +212,15 @@ void editorRefreshScreen() {
 	// reposition cursor to the start
 	abAppend(&ab, "\x1b[1;1H", 6);
 
-	// draw tildes and reposition cursor
+	// draw tildes
 	editorDrawRows(&ab);
-	abAppend(&ab, "\x1b[H", 3);
+
+	// reposition cursor
+	char buf[32];
+	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", E.cy + 1, E.cx + 1);
+	abAppend(&ab, buf, strlen(buf));
+
+	// show the cursor
 	abAppend(&ab, "\x1b[?25h", 6);
 
 	// print out the append buffer to screen and free memory
@@ -224,6 +231,8 @@ void editorRefreshScreen() {
 /*** init ***/
 
 void initEditor() {
+	E.cx = 0;
+	E.cy = 0;
 	if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
 }
 
