@@ -104,13 +104,24 @@ void editorProcessKeyPress() {
 
 /*** output ***/
 
+// function to draw tildes in empty rows
+void editorDrawRows() {
+	int y;
+	for (y = 0; y < 24; y++) {
+		write(STDOUT_FILENO, "~\r\n", 3);
+	}
+}
+
 // function to refresh editor screen
 void editorRefreshScreen() {
 	// clears the whole screen
 	write(STDOUT_FILENO, "\x1b[2J", 4);
-
 	// reposition cursor to the start
 	write(STDOUT_FILENO, "\x1b[1;1H", 6);
+
+	// draw tildes and reposition cursor
+	editorDrawRows();
+	write(STDOUT_FILENO, "\x1b[H", 3);
 }
 
 /*** init ***/
