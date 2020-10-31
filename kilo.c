@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
@@ -123,6 +124,32 @@ int getWindowSize(int *rows, int *cols) {
 	}
 }
 
+/*** append buffer ***/
+
+// append buffer contains a pointer to our buffer in memory and a length
+struct abuf {
+	char *b;
+	int len;
+};
+
+// constructor for append buffer
+#define ABUF_INIT {NULL, 0}
+
+// append method for buffer
+void abAppend(struct abuf *ab, const char *s, int len) {
+	char *new = realloc(ab->b, ab->len + len);
+
+	if (new == NULL) return;
+	memcpy(&new[ab->len], s, len);
+	ab->b = new;
+	ab->len += len;
+}
+
+// destructor for deallocating dynamic memory
+void abFree(struct abuf *ab) {
+	free(ab->b);
+}
+
 /*** input ***/
 
 // function to process key presses
@@ -144,27 +171,34 @@ void editorProcessKeyPress() {
 /*** output ***/
 
 // function to draw tildes in empty rows
-void editorDrawRows() {
+void editorDrawRows(struct abuf *ab) {
 	int y;
 	for (y = 0; y < E.screenrows; y++) {
-		write(STDOUT_FILENO, "~", 1);
+		abAppend(ab, "~", 1);
 
 		if (y < E.screenrows - 1) {
-			write(STDOUT_FILENO, "\r\n", 2);
+			abAppend(ab, "\r\n", 2);
 		}
 	}
 }
 
 // function to refresh editor screen
 void editorRefreshScreen() {
+	// initialize append buffer
+	struct abuf ab = ABUF_INIT;
+
 	// clears the whole screen
-	write(STDOUT_FILENO, "\x1b[2J", 4);
+	abAppend(&ab, "\x1b[2J", 4);
 	// reposition cursor to the start
-	write(STDOUT_FILENO, "\x1b[1;1H", 6);
+	abAppend(&ab, "\x1b[1;1H", 6);
 
 	// draw tildes and reposition cursor
-	editorDrawRows();
-	write(STDOUT_FILENO, "\x1b[H", 3);
+	editorDrawRows(&ab);
+	abAppend(&ab, "\x1b[H", 3);
+
+	// print out the append buffer to screen and free memory
+	write(STDOUT_FILENO, ab.b, ab.len);
+	abFree(&ab);
 }
 
 /*** init ***/
