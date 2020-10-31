@@ -97,6 +97,9 @@ void editorProcessKeyPress() {
 void editorRefreshScreen() {
 	// clears the whole screen
 	write(STDOUT_FILENO, "\x1b[2J", 4);
+
+	// reposition cursor to the start
+	write(STDOUT_FILENO, "\x1b[1;1H", 6);
 }
 
 /*** init ***/
