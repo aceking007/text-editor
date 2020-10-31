@@ -91,6 +91,14 @@ void editorProcessKeyPress() {
 	}
 }
 
+/*** output ***/
+
+// function to refresh editor screen
+void editorRefreshScreen() {
+	// clears the whole screen
+	write(STDOUT_FILENO, "\x1b[2J", 4);
+}
+
 /*** init ***/
 
 int main() {
@@ -98,6 +106,7 @@ int main() {
 
 	char c;
 	while (1){
+		editorRefreshScreen();
 		editorProcessKeyPress();
 	}
 
