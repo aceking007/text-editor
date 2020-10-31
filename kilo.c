@@ -176,6 +176,8 @@ void editorDrawRows(struct abuf *ab) {
 	for (y = 0; y < E.screenrows; y++) {
 		abAppend(ab, "~", 1);
 
+		// clears the line
+		abAppend(ab, "\x1b[K", 3);
 		if (y < E.screenrows - 1) {
 			abAppend(ab, "\r\n", 2);
 		}
@@ -189,8 +191,6 @@ void editorRefreshScreen() {
 
 	// hide the cursor
 	abAppend(&ab, "\x1b[?25l", 6);
-	// clears the whole screen
-	abAppend(&ab, "\x1b[2J", 4);
 	// reposition cursor to the start
 	abAppend(&ab, "\x1b[1;1H", 6);
 
