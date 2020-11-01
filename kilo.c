@@ -438,6 +438,17 @@ void editorDrawRows(struct abuf *ab) {
 	}
 }
 
+// function to draw the status bar
+void editorDrawStatusBar(struct abuf *ab) {
+  abAppend(ab, "\x1b[7m", 4);
+  int len = 0;
+  while (len < E.screencols) {
+    abAppend(ab, " ", 1);
+    len++;
+  }
+  abAppend(ab, "\x1b[m", 3);
+}
+
 // function to refresh editor screen
 void editorRefreshScreen() {
   editorScroll();
@@ -450,8 +461,10 @@ void editorRefreshScreen() {
 	// reposition cursor to the start
 	abAppend(&ab, "\x1b[1;1H", 6);
 
-	// draw tildes
+	// show the file content
 	editorDrawRows(&ab);
+  // draw the status bar
+  editorDrawStatusBar(&ab);
 
 	// reposition cursor
 	char buf[32];
